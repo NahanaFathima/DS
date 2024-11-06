@@ -1,0 +1,89 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX_VERTICES 10 // Maximum number of vertices in the graph
+
+// Graph representation using adjacency matrix
+int graph[MAX_VERTICES][MAX_VERTICES];
+
+// Function to perform Breadth-First Search (BFS)
+void BFS(int start, int n) {
+    int visited[MAX_VERTICES] = {0}; // To keep track of visited vertices
+    int queue[MAX_VERTICES], front = -1, rear = -1;
+
+    // Enqueue the start vertex and mark it as visited
+    rear++;
+    queue[rear] = start;
+    visited[start] = 1;
+
+    printf("BFS starting from vertex %d: ", start);
+
+    while (front != rear) {
+        front++;
+        int currentVertex = queue[front];
+        printf("%d ", currentVertex); // Visit the vertex
+
+        // Explore all adjacent vertices
+        for (int i = 0; i < n; i++) {
+            if (graph[currentVertex][i] == 1 && !visited[i]) {
+                rear++;
+                queue[rear] = i; // Enqueue adjacent vertex
+                visited[i] = 1;   // Mark it as visited
+            }
+        }
+    }
+
+    printf("\n");
+}
+
+// Function to perform Depth-First Search (DFS)
+void DFS(int start, int n, int visited[]) {
+    printf("%d ", start); // Visit the vertex
+    visited[start] = 1;    // Mark the vertex as visited
+
+    // Explore all adjacent vertices
+    for (int i = 0; i < n; i++) {
+        if (graph[start][i] == 1 && !visited[i]) {
+            DFS(i, n, visited); // Recursive DFS call for adjacent vertex
+        }
+    }
+}
+
+// Main function to drive the program
+int main() {
+    int n, e, u, v;
+
+    // Input the number of vertices and edges
+    printf("Enter the number of vertices in the graph: ");
+    scanf("%d", &n);
+    
+    printf("Enter the number of edges in the graph: ");
+    scanf("%d", &e);
+
+    // Initialize the graph as an adjacency matrix with 0's
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            graph[i][j] = 0;
+        }
+    }
+
+    // Input the edges of the graph
+    printf("Enter the edges (u v) where u and v are vertices: \n");
+    for (int i = 0; i < e; i++) {
+        scanf("%d %d", &u, &v);
+        graph[u][v] = 1; // Undirected graph (set both u-v and v-u to 1)
+        graph[v][u] = 1;
+    }
+
+    // Call BFS starting from vertex 0
+    BFS(0, n);
+
+    // Call DFS starting from vertex 0
+    printf("DFS starting from vertex 0: ");
+    int visited[MAX_VERTICES] = {0}; // To keep track of visited vertices in DFS
+    DFS(0, n, visited);
+    printf("\n");
+
+    return 0;
+}
+
