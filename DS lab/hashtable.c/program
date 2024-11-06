@@ -1,0 +1,120 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define TABLE_SIZE 10
+
+// Structure to represent an entry in the hash table
+typedef struct {
+    int key;
+    int value;
+    int isOccupied;  // Flag to indicate if the slot is occupied
+} HashTableEntry;
+
+// Hash table structure
+typedef struct {
+    HashTableEntry table[TABLE_SIZE];
+} HashTable;
+
+// Hash function
+unsigned int hash(int key) {
+    return key % TABLE_SIZE;
+}
+
+// Initialize the hash table
+void initHashTable(HashTable* hashTable) {
+    for (int i = 0; i < TABLE_SIZE; i++) {
+        hashTable->table[i].isOccupied = 0;  // Mark all slots as empty initially
+    }
+}
+
+// Insert key-value pair into the hash table
+void insert(HashTable* hashTable, int key, int value) {
+    unsigned int index = hash(key);
+
+    // Linear probing for collision handling
+    while (hashTable->table[index].isOccupied) {
+        // If the key already exists, we can update the value
+        if (hashTable->table[index].key == key) {
+            hashTable->table[index].value = value;
+            return;
+        }
+
+        // Move to the next slot
+        index = (index + 1) % TABLE_SIZE;
+    }
+
+    // Insert the new key-value pair
+    hashTable->table[index].key = key;
+    hashTable->table[index].value = value;
+    hashTable->table[index].isOccupied = 1;
+}
+
+// Search for a key in the hash table
+int search(HashTable* hashTable, int key) {
+    unsigned int index = hash(key);
+
+    // Linear probing to find the key
+    while (hashTable->table[index].isOccupied) {
+        if (hashTable->table[index].key == key) {
+            return hashTable->table[index].value;
+        }
+        index = (index + 1) % TABLE_SIZE;
+    }
+
+    return -1;  // Return -1 if key is not found
+}
+
+// Delete a key-value pair from the hash table
+void delete(HashTable* hashTable, int key) {
+    unsigned int index = hash(key);
+
+    while (hashTable->table[index].isOccupied) {
+        if (hashTable->table[index].key == key) {
+            hashTable->table[index].isOccupied = 0;  // Mark the slot as empty
+            return;
+        }
+        index = (index + 1) % TABLE_SIZE;
+    }
+
+    printf("Key %d not found.\n", key);
+}
+
+// Print the hash table
+void printTable(HashTable* hashTable) {
+    for (int i = 0; i < TABLE_SIZE; i++) {
+        if (hashTable->table[i].isOccupied) {
+            printf("Index %d: [Key: %d, Value: %d]\n", i, hashTable->table[i].key, hashTable->table[i].value);
+        }
+    }
+}
+
+int main() {
+    HashTable hashTable;
+    initHashTable(&hashTable);
+
+    // Insert key-value pairs
+    insert(&hashTable, 1, 100);
+    insert(&hashTable, 11, 200);
+    insert(&hashTable, 21, 300);
+
+    // Print the hash table
+    printTable(&hashTable);
+
+    // Search for a key
+    int key = 11;
+    int value = search(&hashTable, key);
+    if (value != -1) {
+        printf("Found value for key %d: %d\n", key, value);
+    } else {
+        printf("Key %d not found.\n", key);
+    }
+
+    // Delete a key
+    delete(&hashTable, 11);
+
+    // Print the hash table after deletion
+    printf("\nAfter deleting key 11:\n");
+    printTable(&hashTable);
+
+    return 0;
+}
